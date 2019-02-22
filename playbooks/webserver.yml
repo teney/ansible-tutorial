@@ -1,0 +1,55 @@
+---
+- hosts: webserver
+  become: true
+  tasks:
+    - name: install epel-release
+      yum:
+        name: epel-release
+        state: present
+    - name: install apache
+      yum:
+        name: httpd
+        state: present
+        update_cache: yes
+    - name: delete index.html
+      file:
+        path: /var/www/html/index.html
+        state: absent
+      notify: restart apache
+    - name: start httpd
+      service:
+        name: httpd
+        state: restarted
+        enabled: yes
+  handlers:
+    - name: restart apache
+      service:
+        name: httpd
+        state: restarted
+
+- hosts: app01
+  become: true
+  tasks:
+    - name: setup index.html on first web server
+      copy:
+        content: '<html><header><title>Welcome to server 1</title></header><body>Hello from Server 1</body></html>'
+        dest: /var/www/html/index.html
+        mode: 0644
+  handlers:
+    - name: restart apache
+      service:
+        name: httpd
+        state: restarted
+- hosts: app02
+  become: true
+  tasks:
+    - name: setup index.html on second web server
+      copy:
+        content: '<html><header><title>Welcome to server 2</title></header><body>Hello from Server 2</body></html>'
+        dest: /var/www/html/index.html
+        mode: 0644
+  handlers:
+    - name: restart apache
+      service:
+        name: httpd
+        state: restarted
