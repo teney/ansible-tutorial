@@ -1,0 +1,13 @@
+---
+- name: apache2 configuration
+  copy:
+      src: apache2.conf
+      dest: /etc/apache2/apache2.conf
+- name: create the webpage index.html
+  copy:
+      src: index.html
+      dest: /var/www/html/index.html
+- name: copy the image
+  copy:
+      src: Blue_marble_2015.jpg
+      dest: /var/www/html/Blue_marble_2015.jpg

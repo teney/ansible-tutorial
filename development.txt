@@ -7,3 +7,6 @@ lb01 ansible_user=ansible
 [webserver]
 app01 ansible_user=ansible
 app02 ansible_user=ansible
+
+[myserver1]
+myserver01 ansible_user=ansible

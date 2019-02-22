@@ -2,12 +2,8 @@
 - hosts: loadbalancer
   become: true
   tasks:
-    - name: install epel-release
-      yum:
-        name: epel-release
-        state: present
     - name: install nginx
-      yum:
+      apt:
         name: nginx
         state: present
     - name: start nginx
@@ -15,3 +11,34 @@
         name: nginx
         state: started
         enabled: yes
+    - name: create sites-available
+      file:
+        path: /etc/nginx/sites-available
+        state: directory
+    - name: create sites-enabled
+      file:
+        path: /etc/nginx/sites-enabled
+        state: directory
+    - name: configure nginx
+      template:
+        src: templates/nginx.conf.j2
+        dest: /etc/nginx/sites-available/test
+        mode: 0644
+    - name: delete old link
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+    - name: activate test site
+      file:
+        src: /etc/nginx/sites-available/test
+        dest: /etc/nginx/sites-enabled/test
+        state: link
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+  handlers:
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
